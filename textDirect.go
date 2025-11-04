@@ -16,3 +16,12 @@ func main() {
 	conn.Close()
 	fmt.Println("...Complete.")
 }
+
+func listeningForMsg() {
+	ln, err := net.Listen("tcp", ":8080")
+	fmt.Println("Listening on ", ln.Addr().String())
+	if err != nil {
+		fmt.Println("Dial error: ", err)
+		return //empty return seems standard but unclear on result in goroutine
+	}
+}

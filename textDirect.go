@@ -3,9 +3,16 @@ package main
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 func main() {
+	go listeningForMsg()
+	time.Sleep(2 * time.Second)
+	sendMsg()
+}
+
+func sendMsg() {
 	fmt.Println("Transmitting...")
 	conn, err := net.Dial("tcp", "127.0.0.1:8080")
 	if err != nil {
@@ -38,6 +45,9 @@ func listeningForMsg() {
 				return //if empty return is valid, then ok here?
 			}
 			fmt.Println("Received: ", string(tmp[:size]))
+			conn.Close()
+			ln.Close()
+			return
 		}
 	}
 }

@@ -8,11 +8,22 @@ import (
 )
 
 func main() {
-	var sizeFlag = flag.Int("s", 1024, "Size of message receipt buffer. Defaults to 1024.")
-	progMode := len(os.Args)
+	defBufSize := 1024
+	var sizeFlag = flag.Int("s", defBufSize, fmt.Sprintf("Size of message receipt buffer. Defaults to %d.", defBufSize))
+	argLen := len(os.Args)
+	flag.Parse()
 
-	fmt.Println(progMode)
-	fmt.Println(*sizeFlag)
+	if argLen == 1 || *sizeFlag != defBufSize {
+		listeningForMsg(*sizeFlag)
+	} else if argLen == 3 {
+		//todo: check type?
+		sendMsg(os.Args[1], os.Args[2])
+	} else {
+		fmt.Printf("--Usage--\nListen:\t\t>program\nListenConfig:\t>program -s [listeningBufferSize]\nSend:\t\t>program targetAddress messageToSend")
+	}
+
+	//fmt.Println(argLen)
+	//fmt.Println(*sizeFlag)
 	/*
 		go listeningForMsg()
 		time.Sleep(2 * time.Second)

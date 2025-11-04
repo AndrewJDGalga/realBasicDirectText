@@ -24,4 +24,20 @@ func listeningForMsg() {
 		fmt.Println("Dial error: ", err)
 		return //empty return seems standard but unclear on result in goroutine
 	}
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		if conn != nil {
+			tmp := make([]byte, 1024)
+			size, err := conn.Read(tmp)
+			if err != nil && size > 0 {
+				fmt.Println(err)
+				return //if empty return is valid, then ok here?
+			}
+			fmt.Println("Received: ", string(tmp[:size]))
+		}
+	}
 }

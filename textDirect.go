@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -14,6 +16,7 @@ func main() {
 	flag.Parse()
 
 	if argLen == 1 || *sizeFlag != defBufSize {
+		go cleanExit()
 		listeningForMsg(*sizeFlag)
 	} else if argLen == 3 {
 		//todo: check type?
@@ -21,24 +24,25 @@ func main() {
 	} else {
 		fmt.Printf("--Usage--\nListen:\t\t>program\nListenConfig:\t>program -s [listeningBufferSize]\nSend:\t\t>program targetAddress messageToSend")
 	}
+}
 
-	//fmt.Println(argLen)
-	//fmt.Println(*sizeFlag)
-	/*
-		go listeningForMsg()
-		time.Sleep(2 * time.Second)
-		sendMsg()
-	*/
+func cleanExit() {
+	sigs := make(chan os.Signal, 1) //size 1 standard?
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	sigReceived := <-sigs
+	if sigReceived != nil {
+		os.Exit(0)
+	}
 }
 
 func sendMsg(addr string, msg string) {
 	fmt.Println("Transmitting...")
-	conn, err := net.Dial("tcp", "127.0.0.1:8080")
+	conn, err := net.Dial("tcp", addr) //"127.0.0.1:8080"
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Fprintf(conn, "Hello World")
+	fmt.Fprint(conn, msg)
 	conn.Close()
 	fmt.Println("...Complete.")
 }
@@ -65,11 +69,7 @@ func listeningForMsg(bufferSize int) {
 				return //if empty return is valid, then ok here?
 			}
 			fmt.Println("Received: ", string(tmp[:size]))
-
-			//testing
 			conn.Close()
-			ln.Close()
-			return
 		}
 	}
 }

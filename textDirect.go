@@ -11,7 +11,7 @@ import (
 
 func main() {
 	defBufSize := 1024
-	var sizeFlag = flag.Int("s", defBufSize, fmt.Sprintf("Size of message receipt buffer. Defaults to %d.", defBufSize))
+	var sizeFlag = flag.Int("s", defBufSize, "Size of message receipt buffer.")
 	argLen := len(os.Args)
 	flag.Parse()
 
